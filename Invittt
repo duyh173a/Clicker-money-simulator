@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Clicker Supreme Pro Plus v3</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #1a1a3a; color: #fff; min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; position: relative; }
+        body.light-mode { background: #f0f0f5; color: #1a1a3a; }
+        .container { max-width: 1000px; width: 95%; padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); position: relative; z-index: 1; }
+        .light-mode .container { background: rgba(0, 0, 0, 0.15); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); }
+        h1 { text-align: center; font-size: 2.2em; margin-bottom: 12px; color: #ffd700; }
+        .light-mode h1 { color: #ffaa00; }
+        .money-display { text-align: center; font-size: 1.4em; margin: 12px 0; background: #2a2a4a; padding: 10px; border-radius: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+        .light-mode .money-display { background: #e0e0f0; color: #1a1a3a; }
+        .money-display span { color: #ffd700; }
+        .light-mode .money-display span { color: #ffaa00; }
+        .combo-bar { width: 180px; height: 8px; background: #444; border-radius: 4px; margin: 8px auto; overflow: hidden; }
+        .combo-bar-fill { height: 100%; background: #ffaa00; transition: width 0.2s; }
+        .click-area { display: flex; justify-content: center; margin: 20px 0; }
+        .money-btn { width: 140px; height: 140px; background: #ffd700; border: none; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.6); position: relative; overflow: hidden; touch-action: manipulation; }
+        .money-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(255, 215, 0, 0.8); }
+        .money-btn:active { transform: scale(0.9); }
+        .money-btn img { width: 90px; height: 90px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .upgrades, .missions, .skins, .stats, .withdraw, .invite, .leaderboard, .dice-game, .daily-reward, .vip-section, .debug-log {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 15px;
+        }
+        .upgrade, .mission, .skin, .stat, .withdraw, .invite, .leaderboard, .dice-game, .daily-reward, .vip-section, .debug-log {
+            background: #2a2a4a; padding: 12px; border-radius: 10px; text-align: center; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+        .light-mode .upgrade, .light-mode .mission, .light-mode .skin, .light-mode .stat, .light-mode .withdraw, .light-mode .invite,
+        .light-mode .leaderboard, .light-mode .dice-game, .light-mode .daily-reward, .light-mode .vip-section, .light-mode .debug-log {
+            background: #e0e0f0; color: #1a1a3a; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        .upgrade h3, .mission h3, .skin h3, .stat h3, .withdraw h3, .invite h3, .leaderboard h2, .dice-game h3, .daily-reward h3, .vip-section h3, .debug-log h3 {
+            font-size: 1.1em; margin-bottom: 6px; color: #ffd700;
+        }
+        .light-mode .upgrade h3, .light-mode .mission h3, .light-mode .skin h3, .light-mode .stat h3, .light-mode .withdraw h3, .light-mode .invite h3,
+        .light-mode .leaderboard h2, .light-mode .dice-game h3, .light-mode .daily-reward h3, .light-mode .vip-section h3, .light-mode .debug-log h3 {
+            color: #ffaa00;
+        }
+        .upgrade p, .mission p, .skin p, .stat p, .withdraw p, .invite p, .leaderboard p, .dice-game p, .daily-reward p, .vip-section p, .debug-log p {
+            font-size: 0.85em; color: #ccc;
+        }
+        .light-mode .upgrade p, .light-mode .mission p, .light-mode .skin p, .light-mode .stat p, .light-mode .withdraw p, .light-mode .invite p,
+        .light-mode .leaderboard p, .light-mode .dice-game p, .light-mode .daily-reward p, .light-mode .vip-section p, .light-mode .debug-log p {
+            color: #444;
+        }
+        .upgrade button, .mission button, .skin button, .stat button, .withdraw button, .invite button, .daily-reward button, .vip-section button {
+            margin-top: 8px; padding: 8px 16px; background: #ffd700; border: none; border-radius: 6px; color: #1a1a3a; font-weight: bold; cursor: pointer; box-shadow: 0 0 6px #ffd700;
+        }
+        .light-mode .upgrade button, .light-mode .mission button, .light-mode .skin button, .light-mode .stat button, .light-mode .withdraw button,
+        .light-mode .invite button, .light-mode .daily-reward button, .light-mode .vip-section button {
+            background: #ffaa00; color: #fff; box-shadow: 0 0 6px #ffaa00;
+        }
+        .upgrade button:disabled, .mission button:disabled, .skin button:disabled, .stat button:disabled, .withdraw button:disabled, .invite button:disabled,
+        .daily-reward button:disabled, .vip-section button:disabled {
+            background: #555; box-shadow: none; cursor: not-allowed;
+        }
+        .withdraw input, .invite input, .custom-skin input {
+            width: 100%; padding: 6px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; background: #1a1a3a; color: #fff;
+        }
+        .light-mode .withdraw input, .light-mode .invite input, .light-mode .custom-skin input {
+            background: #f0f0f5; color: #1a1a3a; border: 1px solid #444;
+        }
+        .invite p.invite-code { font-size: 0.9em; font-weight: bold; word-break: break-all; }
+        .floating-money, .floating-gem, .floating-combo, .floating-prestige {
+            position: absolute; font-size: 1em; pointer-events: none; animation: float 1.2s ease-out forwards;
+        }
+        .floating-money { color: #ffd700; }
+        .floating-gem { color: #00ffcc; }
+        .floating-combo { color: #ff4444; font-weight: bold; }
+        .floating-prestige { color: #ff00ff; font-weight: bold; }
+        @keyframes float {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-60px); }
+        }
+        canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .error-message, .achievement {
+            position: fixed; top: 10px; right: 10px; padding: 8px 16px; border-radius: 6px; color: #fff; z-index: 1000; animation: slideIn 0.3s ease-out;
+        }
+        .error-message { background: #ff4444; }
+        .achievement { background: #00cc00; }
+        @keyframes slideIn {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(0); }
+        }
+        .menu-btn { position: fixed; top: 8px; left: 8px; width: 32px; height: 32px; background: #ffd700; border: none; border-radius: 6px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+        .light-mode .menu-btn { background: #ffaa00; }
+        .menu-btn span { width: 18px; height: 2px; background: #1a1a3a; margin: 2px 0; transition: all 0.2s; }
+        .light-mode .menu-btn span { background: #fff; }
+        .menu-btn.open span:nth-child(1) { transform: rotate(45deg) translate(3px, 3px); }
+        .menu-btn.open span:nth-child(2) { opacity: 0; }
+        .menu-btn.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+        .menu { position: fixed; top: 0; left: -100%; width: 200px; height: 100%; background: rgba(42, 42, 74, 0.95); padding: 40px 12px 12px; transition: left 0.2s ease-in-out; z-index: 1500; box-shadow: 2px 0 6px rgba(0, 0, 0, 0.4); }
+        .light-mode .menu { background: rgba(224, 224, 240, 0.95); }
+        .menu.open { left: 0; }
+        .menu button { display: flex; align-items: center; width: 100%; padding: 8px; margin: 6px 0; background: #ffd700; border: none; border-radius: 6px; color: #1a1a3a; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .light-mode .menu button { background: #ffaa00; color: #fff; }
+        .menu button:hover { background: #ffaa00; }
+        .light-mode .menu button:hover { background: #ff9000; }
+        .menu button::before { content: ''; display: inline-block; width: 18px; height: 18px; margin-right: 8px; background-size: contain; }
+        .menu button:nth-child(1)::before { background-image: url('https://img.icons8.com/ios/18/000000/sun.png'); }
+        .menu button:nth-child(2)::before { background-image: url('https://img.icons8.com/ios/18/000000/speaker.png'); }
+        .menu button:nth-child(3)::before { background-image: url('https://img.icons8.com/ios/18/000000/sparkle.png'); }
+        .menu button:nth-child(4)::before { background-image: url('https://img.icons8.com/ios/18/000000/picture.png'); }
+        .menu button:nth-child(5)::before { background-image: url('https://img.icons8.com/ios/18/000000/refresh.png'); }
+        .menu button:nth-child(6)::before { background-image: url('https://img.icons8.com/ios/18/000000/crown.png'); }
+        .menu button:nth-child(7)::before { background-image: url('https://img.icons8.com/ios/18/000000/bug.png'); }
+        .light-mode .menu button::before { filter: invert(1); }
+        #debug-log { display: none; max-height: 200px; overflow-y: auto; }
+        #debug-log.active { display: block; }
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6em; }
+            .money-display { font-size: 1.2em; gap: 10px; padding: 8px; }
+            .money-btn { width: 120px; height: 120px; }
+            .money-btn img { width: 80px; height: 80px; }
+            .upgrades, .missions, .skins, .stats, .withdraw, .invite, .leaderboard, .dice-game, .daily-reward, .vip-section, .debug-log { grid-template-columns: 1fr; gap: 10px; }
+            .upgrade, .mission, .skin, .stat, .withdraw, .invite, .leaderboard, .dice-game, .daily-reward, .vip-section, .debug-log { padding: 10px; }
+            .upgrade h3, .mission h3, .skin h3, .stat h3, .withdraw h3, .invite h3, .leaderboard h2, .dice-game h3, .daily-reward h3, .vip-section h3, .debug-log h3 { font-size: 1em; }
+            .upgrade p, .mission p, .skin p, .stat p, .withdraw p, .invite p, .leaderboard p, .dice-game p, .daily-reward p, .vip-section p, .debug-log p { font-size: 0.8em; }
+        }
+        @media (max-width: 400px) {
+            .container { padding: 10px; }
+            h1 { font-size: 1.4em; }
+            .money-display { font-size: 1em; }
+            .money-btn { width: 100px; height: 100px; }
+            .money-btn img { width: 70px; height: 70px; }
+            .menu { width: 180px; }
+        }
+        @media (min-width: 1200px) {
+            .container { padding: 20px; }
+            h1 { font-size: 2.8em; }
+            .money-display { font-size: 1.8em; }
+            .money-btn { width: 160px; height: 160px; }
+            .money-btn img { width: 100px; height: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+    <div class="error-message" id="error-message"></div>
+    <div class="achievement" id="achievement"></div>
+    <button class="menu-btn" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="menu" id="menu">
+        <button onclick="toggleTheme()">Đổi giao diện</button>
+        <button id="sound-btn" onclick="toggleSound()">Âm thanh: Bật</button>
+        <button id="particle-btn" onclick="toggleParticle()">Hiệu ứng: Bật</button>
+        <button id="graphics-btn" onclick="toggleGraphics()">Đồ họa: Cao</button>
+        <button onclick="resetGame()">Reset Game</button>
+        <button onclick="prestige()">Prestige</button>
+        <button onclick="toggleDebugLog()">Xem Debug Log</button>
+    </div>
+    <div class="container">
+        <h1>Money Clicker Supreme Pro Plus v3</h1>
+        <div class="money-display">
+            <span>USDT: <span id="usdt">0</span></span>
+            <span>USD: $<span id="usd">0</span></span>
+            <span>VND: ₫<span id="vnd">0</span></span>
+            <span>Gems: <span id="gems">0</span></span>
+            <span>Combo: x<span id="combo">1</span></span>
+            <span>Prestige: <span id="prestige">0</span></span>
+            <span>VIP: <span id="vip-level">0</span></span>
+        </div>
+        <div class="combo-bar">
+            <div class="combo-bar-fill" id="combo-bar-fill"></div>
+        </div>
+        <div class="click-area">
+            <button class="money-btn">
+                <img id="click-skin" src="https://img.icons8.com/color/96/000000/money-bag.png" alt="Túi tiền">
+            </button>
+        </div>
+        <div class="upgrades">
+            <div class="upgrade">
+                <h3>Sức mạnh click</h3>
+                <p>Giá: <span id="click-cost">0.01</span> USDT</p>
+                <p>Cấp: <span id="click-level">1</span></p>
+                <button onclick="buyClickUpgrade()">Nâng cấp</button>
+            </div>
+            <div class="upgrade">
+                <h3>Auto Clicker</h3>
+                <p>Giá: <span id="auto-cost">0.05</span> USDT</p>
+                <p>Cấp: <span id="auto-level">0</span></p>
+                <button onclick="buyAutoUpgrade()">Nâng cấp</button>
+            </div>
+            <div class="upgrade">
+                <h3>Nhân tiền</h3>
+                <p>Giá: <span id="multiplier-cost">5</span> Gems</p>
+                <p>Cấp: <span id="multiplier-level">1</span></p>
+                <button onclick="buyMultiplier()">Nâng cấp</button>
+            </div>
+        </div>
+        <div class="missions">
+            <div class="mission">
+                <h3>Kiếm 0.05 USDT</h3>
+                <p>Thưởng: 3 Gems</p>
+                <button onclick="claimMission(0)" disabled>Nhận</button>
+            </div>
+            <div class="mission">
+                <h3>Click 30 lần</h3>
+                <p>Thưởng: 4 Gems</p>
+                <button onclick="claimMission(1)" disabled>Nhận</button>
+            </div>
+        </div>
+        <div class="skins">
+            <div class="skin">
+                <h3>Đồng vàng</h3>
+                <p>Giá: 5 Gems</p>
+                <button onclick="buySkin('https://img.icons8.com/color/96/000000/coins.png')">Mua</button>
+            </div>
+            <div class="skin">
+                <h3>Kim cương</h3>
+                <p>Giá: 10 Gems</p>
+                <button onclick="buySkin('https://img.icons8.com/color/96/000000/diamond.png')">Mua</button>
+            </div>
+            <div class="skin vip">
+                <h3>Vương miện VIP</h3>
+                <p>Cần VIP cấp 1</p>
+                <button onclick="buySkin('https://img.icons8.com/color/96/000000/crown.png')">Mua</button>
+            </div>
+            <div class="skin custom-skin">
+                <h3>Skin tùy chỉnh</h3>
+                <input id="custom-skin-url" placeholder="Nhập URL ảnh">
+                <button onclick="buyCustomSkin()">Áp dụng (10 Gems)</button>
+            </div>
+        </div>
+        <div class="withdraw">
+            <h3>Rút USDT</h3>
+            <p>Tối thiểu: 10 USDT | Phí: 1 USDT | 1 lần/ngày</p>
+            <input id="wallet-address" placeholder="Nhập địa chỉ ví">
+            <button onclick="withdrawUSDT()">Rút</button>
+        </div>
+        <div class="invite">
+            <h3>Mời bạn bè</h3>
+            <p>Mã của bạn: <span class="invite-code" id="invite-code">Đang tạo...</span></p>
+            <button onclick="copyInviteCode()">Sao chép mã</button>
+            <p>Nhập mã bạn bè:</p>
+            <input id="referral-code" placeholder="Nhập mã mời">
+            <button onclick="enterReferralCode()">Gửi</button>
+        </div>
+        <div class="dice-game">
+            <h3>Trò chơi xúc xắc</h3>
+            <p>Tung xúc xắc để có cơ hội thắng Gems! Giá: 0.1 USDT</p>
+            <button onclick="playDiceGame()">Tung xúc xắc</button>
+        </div>
+        <div class="daily-reward">
+            <h3>Thưởng hàng ngày</h3>
+            <p>Nhận Gems miễn phí mỗi 24 giờ!</p>
+            <button id="daily-reward-btn" onclick="claimDailyReward()">Nhận</button>
+        </div>
+        <div class="vip-section">
+            <h3>Thành viên VIP</h3>
+            <p>Giá: 50 Gems | Thưởng: +20% Gems</p>
+            <button onclick="buyVIP()">Trở thành VIP</button>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <h3>Tổng số click</h3>
+                <p><span id="total-clicks">0</span></p>
+            </div>
+            <div class="stat">
+                <h3>Tổng USDT kiếm được</h3>
+                <p><span id="total-usdt">0</span> USDT</p>
+            </div>
+            <div class="stat">
+                <h3>Bạn bè mời</h3>
+                <p><span id="friends-invited">0</span></p>
+            </div>
+        </div>
+        <div class="leaderboard">
+            <h2>Bảng xếp hạng</h2>
+            <ul id="leaderboard-list"></ul>
+        </div>
+        <div class="debug-log" id="debug-log">
+            <h3>Debug Log</h3>
+            <ul id="debug-log-list"></ul>
+        </div>
+    </div>
+
+    <audio id="click-sound" src="https://www.soundjay.com/buttons/click-1a.mp3" preload="auto"></audio>
+    <audio id="upgrade-sound" src="https://www.soundjay.com/buttons/click-2a.mp3" preload="auto"></audio>
+    <audio id="background-music" src="https://www.bensound.com/bensound-music/bensound-sunny.mp3" loop preload="auto"></audio>
+    <audio id="dice-sound" src="https://www.soundjay.com/misc/dice-1.mp3" preload="auto"></audio>
+    <audio id="prestige-sound" src="https://www.soundjay.com/buttons/click-3a.mp3" preload="auto"></audio>
+    <audio id="vip-sound" src="https://www.soundjay.com/buttons/click-4a.mp3" preload="auto"></audio>
+    <audio id="withdraw-sound" src="https://www.soundjay.com/buttons/click-5a.mp3" preload="auto"></audio>
+    <audio id="invite-sound" src="https://www.soundjay.com/buttons/click-6a.mp3" preload="auto"></audio>
+
+    <script>
+        // ErrorFixerBot nâng cấp
+        const ErrorFixerBot = {
+            validVars: [],
+            commonProps: ['textContent', 'innerText', 'innerHTML', 'style', 'value', 'disabled', 'src', 'classList', 'display'],
+            errorLog: [],
+            init() {
+                this.validVars = [
+                    ...Object.keys(window).filter(k => typeof window[k] !== 'function'),
+                    ...Object.keys(elements),
+                    ...this.commonProps
+                ];
+                window.onerror = (msg, url, line) => {
+                    this.fixError(new Error(`${msg} at line ${line}`), 'Global');
+                    return true;
+                };
+            },
+            fixError(error, context = 'Unknown') {
+                try {
+                    let fixMessage = '';
+                    if (error instanceof ReferenceError || error.message.includes('not defined')) {
+                        const wrongVar = error.message.match(/(\w+) is not defined/)?.[1];
+                        if (wrongVar) {
+                            const closest = this.validVars.reduce((a, b) => {
+                                const distA = this.levenshtein(wrongVar, a);
+                                const distB = this.levenshtein(wrongVar, b);
+                                return distA < distB ? a : b;
+                            });
+                            if (this.levenshtein(wrongVar, closest) <= 3) {
+                                fixMessage = `Thay ${wrongVar} bằng ${closest}`;
+                                this.logFix(error, fixMessage, context);
+                                return closest;
+                            }
+                        }
+                    } else if (error instanceof TypeError && error.message.includes('null')) {
+                        const match = error.message.match(/Cannot set properties of null \(setting '(\w+)'\)/);
+                        if (match) {
+                            const prop = match[1];
+                            const id = Object.keys(elements).find(k => elements[k]?.id === error.stack?.match(/getElementById\("(\w+)"\)/)?.[1]);
+                            if (id) {
+                                const element = document.getElementById(elements[id].id);
+                                if (element) {
+                                    fixMessage = `Tái tạo phần tử ${id} cho ${prop}`;
+                                    elements[id] = element;
+                                    this.logFix(error, fixMessage, context);
+                                    return element;
+                                }
+                            }
+                            fixMessage = `Không tìm thấy phần tử DOM. Dùng console.warn thay thế.`;
+                            console.warn(error.message);
+                            this.logFix(error, fixMessage, context);
+                            return null;
+                        }
+                    } else if (error instanceof TypeError && error.message.includes('is not a function')) {
+                        const match = error.message.match(/(\w+) is not a function/);
+                        if (match && context === 'checkAchievements') {
+                            const achId = error.stack?.match(/achievements\[(\w+)\]/)?.[1];
+                            if (achId && defaultAchievements[achId]) {
+                                fixMessage = `Tái tạo hàm condition cho thành tựu ${achId}`;
+                                achievements.set(achId, { ...achievements.get(achId), condition: defaultAchievements[achId].condition });
+                                this.logFix(error, fixMessage, context);
+                                return defaultAchievements[achId].condition;
+                            }
+                            fixMessage = `Không tìm thấy thành tựu ${achId || 'chưa rõ'}. Bỏ qua.`;
+                            this.logFix(error, fixMessage, context);
+                            return () => false;
+                        }
+                    }
+                    fixMessage = 'Không thể tự sửa. Vui lòng kiểm tra code.';
+                    this.logFix(error, fixMessage, context);
+                    return null;
+                } catch (e) {
+                    console.warn('ErrorFixerBot thất bại:', e);
+                    this.logFix(e, 'ErrorFixerBot lỗi nội bộ.', context);
+                }
+            },
+            logFix(error, fix, context) {
+                const logEntry = {
+                    time: new Date().toLocaleTimeString('vi-VN'),
+                    error: error.message,
+                    fix,
+                    context
+                };
+                this.errorLog.unshift(logEntry);
+                if (this.errorLog.length > 15) this.errorLog = this.errorLog.slice(0, 15);
+                console.warn(`ErrorFixerBot [${context}]: ${error.message} -> ${fix}`);
+                if (elements.debugLogList) {
+                    elements.debugLogList.innerHTML = this.errorLog.map(e => `<li>${e.time}: ${e.error} -> ${e.fix} (${e.context})</li>`).join('');
+                }
+                showError(`Lỗi: ${error.message}. ${fix}`);
+            },
+            levenshtein(a, b) {
+                const dp = Array(a.length + 1).fill().map(() => Array(b.length + 1).fill(0));
+                for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+                for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+                for (let i = 1; i <= a.length; i++) {
+                    for (let j = 1; j <= b.length; j++) {
+                        dp[i][j] = Math.min(
+                            dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+                            dp[i - 1][j] + 1,
+                            dp[i][j - 1] + 1
+                        );
+                    }
+                }
+                return dp[a.length][b.length];
+            }
+        };
+
+        let usdt = 0;
+        let gems = 0;
+        let clickPower = 0.0001;
+        let clickCost = 0.01;
+        let clickLevel = 1;
+        let autoPower = 0;
+        let autoCost = 0.05;
+        let autoLevel = 0;
+        let multiplier = 1;
+        let multiplierCost = 5;
+        let multiplierLevel = 1;
+        let clickCount = 0;
+        let totalUsdtEarned = 0;
+        let combo = 1;
+        let lastClickTime = 0;
+        let prestigeLevel = 0;
+        let vipLevel = 0;
+        let soundEnabled = true;
+        let particleEnabled = true;
+        let graphicsMode = 'high';
+        let currentSkin = 'https://img.icons8.com/color/96/000000/money-bag.png';
+        let startTime = Date.now();
+        let lastDailyReward = 0;
+        let lastWithdraw = 0;
+        let inviteCode = '';
+        let referredBy = '';
+        let friendsInvited = [];
+        let friendBonusUsdt = 0;
+        let lastFriendBonusTime = 0;
+        let lastSaveTime = 0;
+        let needsSave = false;
+
+        const USDT_TO_USD = 1;
+        const USDT_TO_VND = 25928.26;
+
+        const elements = {
+            usdt: document.getElementById('usdt'),
+            usd: document.getElementById('usd'),
+            vnd: document.getElementById('vnd'),
+            gems: document.getElementById('gems'),
+            combo: document.getElementById('combo'),
+            prestige: document.getElementById('prestige'),
+            vipLevel: document.getElementById('vip-level'),
+            clickCost: document.getElementById('click-cost'),
+            clickLevel: document.getElementById('click-level'),
+            autoCost: document.getElementById('auto-cost'),
+            autoLevel: document.getElementById('auto-level'),
+            multiplierCost: document.getElementById('multiplier-cost'),
+            multiplierLevel: document.getElementById('multiplier-level'),
+            totalClicks: document.getElementById('total-clicks'),
+            totalUsdt: document.getElementById('total-usdt'),
+            friendsInvited: document.getElementById('friends-invited'),
+            comboBarFill: document.getElementById('combo-bar-fill'),
+            moneyBtn: document.querySelector('.money-btn'),
+            clickSkin: document.getElementById('click-skin'),
+            inviteCode: document.getElementById('invite-code'),
+            referralCode: document.getElementById('referral-code'),
+            dailyRewardBtn: document.getElementById('daily-reward-btn'),
+            customSkinUrl: document.getElementById('custom-skin-url'),
+            walletAddress: document.getElementById('wallet-address'),
+            leaderboardList: document.getElementById('leaderboard-list'),
+            errorMessage: document.getElementById('error-message'),
+            achievement: document.getElementById('achievement'),
+            soundBtn: document.getElementById('sound-btn'),
+            particleBtn: document.getElementById('particle-btn'),
+            graphicsBtn: document.getElementById('graphics-btn'),
+            menu: document.getElementById('menu'),
+            menuBtn: document.querySelector('.menu-btn'),
+            debugLog: document.getElementById('debug-log'),
+            debugLogList: document.getElementById('debug-log-list')
+        };
+
+        Object.keys(elements).forEach(key => {
+            if (!elements[key]) console.warn(`Phần tử ${key} không tìm thấy trong DOM`);
+        });
+
+        const audio = {
+            click: document.getElementById('click-sound'),
+            upgrade: document.getElementById('upgrade-sound'),
+            music: document.getElementById('background-music'),
+            dice: document.getElementById('dice-sound'),
+            prestige: document.getElementById('prestige-sound'),
+            vip: document.getElementById('vip-sound'),
+            withdraw: document.getElementById('withdraw-sound'),
+            invite: document.getElementById('invite-sound')
+        };
+
+        const missions = new Map([
+            [0, { goal: 0.05, reward: 3, completed: false, type: 'usdt' }],
+            [1, { goal: 30, reward: 4, completed: false, type: 'clicks' }]
+        ]);
+
+        const defaultAchievements = {
+            usdt1: { name: 'USDT Đồng', condition: () => totalUsdtEarned >= 0.1, rewarded: false, tier: 'Bronze' },
+            usdt2: { name: 'USDT Bạc', condition: () => totalUsdtEarned >= 0.5, rewarded: false, tier: 'Silver' },
+            usdt3: { name: 'USDT Vàng', condition: () => totalUsdtEarned >= 1, rewarded: false, tier: 'Gold' },
+            click1: { name: 'Click Đồng', condition: () => clickCount >= 50, rewarded: false, tier: 'Bronze' },
+            click2: { name: 'Click Bạc', condition: () => clickCount >= 200, rewarded: false, tier: 'Silver' },
+            prestige: { name: 'Tiên phong Prestige', condition: () => prestigeLevel >= 1, rewarded: false, tier: 'Gold' },
+            vip: { name: 'VIP Tinh anh', condition: () => vipLevel >= 1, rewarded: false, tier: 'Gold' },
+            invite: { name: 'Ngôi sao xã hội', condition: () => friendsInvited.length >= 1, rewarded: false, tier: 'Silver' }
+        };
+
+        const achievements = new Map(Object.entries(defaultAchievements));
+
+        function generateInviteCode() {
+            const timestamp = Date.now().toString(36);
+            const randomStr = Math.random().toString(36).substr(2, 5);
+            return `MCSPP-${timestamp}-${randomStr}`.toUpperCase();
+        }
+
+        function toggleMenu() {
+            try {
+                elements.menu.classList.toggle('open');
+                elements.menuBtn.classList.toggle('open');
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'toggleMenu');
+            }
+        }
+
+        function toggleDebugLog() {
+            try {
+                elements.debugLog.classList.toggle('active');
+                toggleMenu();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'toggleDebugLog');
+            }
+        }
+
+        function showError(message) {
+            try {
+                if (elements.errorMessage) {
+                    elements.errorMessage.textContent = message;
+                    elements.errorMessage.style.display = 'block';
+                    setTimeout(() => {
+                        if (elements.errorMessage) elements.errorMessage.style.display = 'none';
+                    }, 2000);
+                } else {
+                    console.warn('Error:', message);
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'showError');
+            }
+        }
+
+        function showAchievement(message, tier = '') {
+            try {
+                if (elements.achievement) {
+                    elements.achievement.textContent = `Thành tựu: ${message} (${tier})`;
+                    elements.achievement.style.display = 'block';
+                    setTimeout(() => {
+                        if (elements.achievement) elements.achievement.style.display = 'none';
+                    }, 2000);
+                    playSound(audio.upgrade);
+                } else {
+                    console.warn('Achievement:', message);
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'showAchievement');
+            }
+        }
+
+        function playSound(sound) {
+            try {
+                if (soundEnabled && sound.readyState >= 2) {
+                    sound.play().catch(() => {});
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'playSound');
+            }
+        }
+
+        function vibrate() {
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate(30);
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'vibrate');
+            }
+        }
+
+        elements.moneyBtn.addEventListener('click', () => {
+            try {
+                const now = Date.now();
+                if (now - lastClickTime < 500) {
+                    combo = Math.min(combo + 0.5, 5);
+                } else {
+                    combo = 1;
+                }
+                lastClickTime = now;
+
+                const prestigeBonus = 1 + prestigeLevel * 0.1;
+                const vipBonus = 1 + vipLevel * 0.2;
+                const earned = clickPower * multiplier * combo * prestigeBonus * vipBonus;
+                usdt += earned;
+                totalUsdtEarned += earned;
+                clickCount++;
+                showFloatingUsdt(earned);
+                if (combo > 1) showFloatingCombo(combo);
+                playSound(audio.click);
+                vibrate();
+                needsSave = true;
+                requestAnimationFrame(updateDisplay);
+                checkMissions();
+                checkAchievements();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'moneyBtnClick');
+            }
+        }, { passive: true });
+
+        function updateDisplay() {
+            try {
+                if (elements.usdt) elements.usdt.textContent = usdt.toFixed(4);
+                if (elements.usd) elements.usd.textContent = (usdt * USDT_TO_USD).toFixed(2);
+                if (elements.vnd) elements.vnd.textContent = Math.floor(usdt * USDT_TO_VND);
+                if (elements.gems) elements.gems.textContent = gems;
+                if (elements.combo) elements.combo.textContent = combo.toFixed(1);
+                if (elements.prestige) elements.prestige.textContent = prestigeLevel;
+                if (elements.vipLevel) elements.vipLevel.textContent = vipLevel;
+                if (elements.clickCost) elements.clickCost.textContent = Number(clickCost).toFixed(2);
+                if (elements.clickLevel) elements.clickLevel.textContent = clickLevel;
+                if (elements.autoCost) elements.autoCost.textContent = Number(autoCost).toFixed(2);
+                if (elements.autoLevel) elements.autoLevel.textContent = autoLevel;
+                if (elements.multiplierCost) elements.multiplierCost.textContent = multiplierCost;
+                if (elements.multiplierLevel) elements.multiplierLevel.textContent = multiplierLevel;
+                if (elements.totalClicks) elements.totalClicks.textContent = clickCount;
+                if (elements.totalUsdt) elements.totalUsdt.textContent = totalUsdtEarned.toFixed(4);
+                if (elements.friendsInvited) elements.friendsInvited.textContent = friendsInvited.length;
+                if (elements.comboBarFill) elements.comboBarFill.style.width = `${(combo - 1) * 20}%`;
+                if (elements.inviteCode) elements.inviteCode.textContent = inviteCode || 'Đang tạo...';
+                updateDailyRewardButton();
+                updateLeaderboard();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'updateDisplay');
+            }
+        }
+
+        function buyClickUpgrade() {
+            try {
+                if (usdt >= clickCost) {
+                    usdt -= clickCost;
+                    clickPower += 0.0001;
+                    clickLevel += 1;
+                    clickCost = parseFloat((clickCost * 1.5).toFixed(2));
+                    needsSave = true;
+                    requestAnimationFrame(updateDisplay);
+                    playSound(audio.upgrade);
+                } else {
+                    showError('Không đủ USDT!');
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'buyClickUpgrade');
+            }
+        }
+
+        function buyAutoUpgrade() {
+            try {
+                if (usdt >= autoCost) {
+                    usdt -= autoCost;
+                    autoPower += 0.0001;
+                    autoLevel += 1;
+                    autoCost = parseFloat((autoCost * 1.5).toFixed(2));
+                    needsSave = true;
+                    requestAnimationFrame(updateDisplay);
+                    playSound(audio.upgrade);
+                } else {
+                    showError('Không đủ USDT!');
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'buyAutoUpgrade');
+            }
+        }
+
+        function buyMultiplier() {
+            try {
+                if (gems >= multiplierCost) {
+                    gems -= multiplierCost;
+                    multiplier += 0.5;
+                    multiplierLevel += 1;
+                    multiplierCost = Math.round(multiplierCost * 2);
+                    needsSave = true;
+                    requestAnimationFrame(updateDisplay);
+                    playSound(audio.upgrade);
+                } else {
+                    showError('Không đủ Gems!');
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'buyMultiplier');
+            }
+        }
+
+        function buySkin(skinUrl) {
+            try {
+                const costs = {
+                    'https://img.icons8.com/color/96/000000/coins.png': 5,
+                    'https://img.icons8.com/color/96/000000/diamond.png': 10,
+                    'https://img.icons8.com/color/96/000000/crown.png': vipLevel >= 1 ? 0 : Infinity
+                };
+                const cost = costs[skinUrl];
+                if (cost === Infinity) {
+                    showError('Cần VIP cấp 1!');
+                } else if (gems >= cost) {
+                    gems -= cost;
+                    currentSkin = skinUrl;
+                    elements.clickSkin.src = skinUrl;
+                    needsSave = true;
+                    requestAnimationFrame(updateDisplay);
+                    playSound(audio.upgrade);
+                    showAchievement('Mở khóa skin mới!');
+                } else {
+                    showError('Không đủ Gems!');
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'buySkin');
+            }
+        }
+
+        function buyCustomSkin() {
+            try {
+                const url = elements.customSkinUrl.value.trim();
+                if (!url || !url.match(/\.(jpeg|jpg|png|gif)$/i)) {
+                    showError('URL ảnh không hợp lệ!');
+                    return;
+                }
+                if (gems >= 10) {
+                    gems -= 10;
+                    currentSkin = url;
+                    elements.clickSkin.src = url;
+                    needsSave = true;
+                    requestAnimationFrame(updateDisplay);
+                    playSound(audio.upgrade);
+                    showAchievement('Áp dụng skin tùy chỉnh!');
+                } else {
+                    showError('Không đủ Gems!');
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'buyCustomSkin');
+            }
+        }
+
+        function playDiceGame() {
+            try {
+                if (usdt >= 0.1) {
+                    usdt -= 0.1;
+                    const roll = Math.floor(Math.random() * 6) + 1;
+                    const gemReward = roll >= 4 ? roll * (1 + vipLevel * 0.2) : 0;
+                    if (gemReward > 0) {
+                        gems += gemReward;
+                        showFloatingGem(Math.floor(gemReward));
+                        showAchievement(`Thắng xúc xắc: +${Math.floor(gemReward)} Gems!`);
+                    } else {
+                        showError('Không thắng Gems lần này. Thử lại!');
+                    }
+                    needsSave = true;
+                    requestAnimationFrame(updateDisplay);
+                    playSound(audio.dice);
+                    vibrate();
+                } else {
+                    showError('Không đủ USDT!');
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'playDiceGame');
+            }
+        }
+
+        function claimDailyReward() {
+            try {
+                const now = Date.now();
+                if (now - lastDailyReward >= 24 * 60 * 60 * 1000) {
+                    const reward = 5 + vipLevel * 2;
+                    gems += reward;
+                    lastDailyReward = now;
+                    showFloatingGem(reward);
+                    showAchievement(`Thưởng hàng ngày: +${reward} Gems!`);
+                    needsSave = true;
+                    requestAnimationFrame(updateDisplay);
+                    playSound(audio.upgrade);
+                } else {
+                    showError('Quay lại vào ngày mai để nhận thêm Gems!');
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'claimDailyReward');
+            }
+        }
+
+        function updateDailyRewardButton() {
+            try {
+                const now = Date.now();
+                elements.dailyRewardBtn.disabled = now - lastDailyReward < 24 * 60 * 60 * 1000;
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'updateDailyRewardButton');
+            }
+        }
+
+        function buyVIP() {
+            try {
+                if (gems >= 50 && vipLevel === 0) {
+                    gems -= 50;
+                    vipLevel = 1;
+                    needsSave = true;
+                    requestAnimationFrame(updateDisplay);
+                    playSound(audio.vip);
+                    showAchievement('VIP Tinh anh', 'Gold');
+                    checkAchievements();
+                } else if (vipLevel > 0) {
+                    showError('Bạn đã là VIP!');
+                } else {
+                    showError('Không đủ Gems!');
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'buyVIP');
+            }
+        }
+
+        function withdrawUSDT() {
+            try {
+                const now = Date.now();
+                const address = elements.walletAddress.value.trim();
+                if (now - lastWithdraw < 24 * 60 * 60 * 1000) {
+                    showError('Chỉ được rút 1 lần mỗi ngày!');
+                    return;
+                }
+                if (!address || address.length < 10) {
+                    showError('Địa chỉ ví không hợp lệ!');
+                    return;
+                }
+                if (usdt < 10) {
+                    showError('Rút tối thiểu 10 USDT!');
+                    return;
+                }
+                usdt -= 11;
+                lastWithdraw = now;
+                showAchievement(`Rút 10 USDT tới ${address.slice(0, 6)}...!`);
+                needsSave = true;
+                requestAnimationFrame(updateDisplay);
+                playSound(audio.withdraw);
+                vibrate();
+                elements.walletAddress.value = '';
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'withdrawUSDT');
+            }
+        }
+
+        function copyInviteCode() {
+            try {
+                if (inviteCode) {
+                    navigator.clipboard.writeText(inviteCode).then(() => {
+                        showAchievement('Sao chép mã mời!');
+                        playSound(audio.invite);
+                    }).catch(() => {
+                        showError('Sao chép mã thất bại. Thử lại.');
+                    });
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'copyInviteCode');
+            }
+        }
+
+        function enterReferralCode() {
+            try {
+                const code = elements.referralCode.value.trim();
+                if (!code || code === inviteCode) {
+                    showError('Mã mời không hợp lệ hoặc là mã của bạn!');
+                    return;
+                }
+                if (referredBy) {
+                    showError('Bạn đã sử dụng mã mời!');
+                    return;
+                }
+                referredBy = code;
+                const gemBonus = vipLevel >= 1 ? 7 : 5;
+                gems += gemBonus;
+                showFloatingGem(gemBonus);
+                showAchievement(`Được mời bởi bạn! +${gemBonus} Gems`);
+                needsSave = true;
+                requestAnimationFrame(updateDisplay);
+                playSound(audio.invite);
+                vibrate();
+                elements.referralCode.value = '';
+                const inviterData = JSON.parse(localStorage.getItem(`moneyClickerSupremeProPlus-${code}`)) || {};
+                if (inviterData) {
+                    inviterData.gems = (inviterData.gems || 0) + gemBonus;
+                    inviterData.friendsInvited = inviterData.friendsInvited || [];
+                    inviterData.friendsInvited.push(inviteCode);
+                    localStorage.setItem(`moneyClickerSupremeProPlus-${code}`, JSON.stringify(inviterData));
+                }
+                checkAchievements();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'enterReferralCode');
+            }
+        }
+
+        function prestige() {
+            try {
+                if (usdt >= 1 && confirm('Prestige sẽ reset tiến độ để nhận thưởng vĩnh viễn. Tiếp tục?')) {
+                    prestigeLevel += 1;
+                    usdt = 0;
+                    clickPower = 0.0001;
+                    clickCost = 0.01;
+                    clickLevel = 1;
+                    autoPower = 0;
+                    autoCost = 0.05;
+                    autoLevel = 0;
+                    multiplier = 1;
+                    multiplierCost = 5;
+                    multiplierLevel = 1;
+                    combo = 1;
+                    missions.forEach(m => m.completed = false);
+                    showFloatingPrestige(prestigeLevel);
+                    needsSave = true;
+                    requestAnimationFrame(updateDisplay);
+                    checkMissions();
+                    checkAchievements();
+                    playSound(audio.prestige);
+                    showAchievement('Mở khóa Prestige!', 'Gold');
+                } else if (usdt < 1) {
+                    showError('Cần 1 USDT để Prestige!');
+                }
+                toggleMenu();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'prestige');
+            }
+        }
+
+        function showFloatingUsdt(amount) {
+            try {
+                if (graphicsMode === 'ultra-low') return;
+                const float = document.createElement('div');
+                float.className = 'floating-money';
+                float.textContent = `+${amount.toFixed(4)} USDT`;
+                float.style.left = `${elements.moneyBtn.offsetLeft + Math.random() * 100 - 50}px`;
+                float.style.top = `${elements.moneyBtn.offsetTop}px`;
+                document.body.appendChild(float);
+                setTimeout(() => float.remove(), 1200);
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'showFloatingUsdt');
+            }
+        }
+
+        function showFloatingGem(amount) {
+            try {
+                if (graphicsMode === 'ultra-low') return;
+                const float = document.createElement('div');
+                float.className = 'floating-gem';
+                float.textContent = `+${Math.floor(amount)} Gems`;
+                float.style.left = `${elements.moneyBtn.offsetLeft + Math.random() * 100 - 50}px`;
+                float.style.top = `${elements.moneyBtn.offsetTop}px`;
+                document.body.appendChild(float);
+                setTimeout(() => float.remove(), 1200);
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'showFloatingGem');
+            }
+        }
+
+        function showFloatingCombo(amount) {
+            try {
+                if (graphicsMode === 'ultra-low') return;
+                const float = document.createElement('div');
+                float.className = 'floating-combo';
+                float.textContent = `Combo x${amount.toFixed(1)}`;
+                float.style.left = `${elements.moneyBtn.offsetLeft + Math.random() * 100 - 50}px`;
+                float.style.top = `${elements.moneyBtn.offsetTop + 20}px`;
+                document.body.appendChild(float);
+                setTimeout(() => float.remove(), 1200);
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'showFloatingCombo');
+            }
+        }
+
+        function showFloatingPrestige(level) {
+            try {
+                if (graphicsMode === 'ultra-low') return;
+                const float = document.createElement('div');
+                float.className = 'floating-prestige';
+                float.textContent = `Prestige ${level}!`;
+                float.style.left = `${elements.moneyBtn.offsetLeft + Math.random() * 100 - 50}px`;
+                float.style.top = `${elements.moneyBtn.offsetTop - 10}px`;
+                document.body.appendChild(float);
+                setTimeout(() => float.remove(), 1200);
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'showFloatingPrestige');
+            }
+        }
+
+        function checkMissions() {
+            try {
+                const missionButtons = document.querySelectorAll('.mission button');
+                missions.forEach((mission, index) => {
+                    if (!mission.completed) {
+                        if (mission.type === 'usdt' && usdt >= mission.goal) {
+                            missionButtons[index].disabled = false;
+                        } else if (mission.type === 'clicks' && clickCount >= mission.goal) {
+                            missionButtons[index].disabled = false;
+                        }
+                    }
+                });
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'checkMissions');
+            }
+        }
+
+        function claimMission(index) {
+            try {
+                const mission = missions.get(index);
+                if (!mission.completed) {
+                    mission.completed = true;
+                    const reward = mission.reward * (1 + vipLevel * 0.2);
+                    gems += reward;
+                    showFloatingGem(Math.floor(reward));
+                    needsSave = true;
+                    requestAnimationFrame(updateDisplay);
+                    document.querySelectorAll('.mission button')[index].disabled = true;
+                    playSound(audio.upgrade);
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'claimMission');
+            }
+        }
+
+        function checkAchievements() {
+            try {
+                achievements.forEach((ach, id) => {
+                    if (!ach.rewarded && typeof ach.condition === 'function' && ach.condition()) {
+                        ach.rewarded = true;
+                        showAchievement(ach.name, ach.tier);
+                        gems += ach.tier === 'Bronze' ? 3 : ach.tier === 'Silver' ? 5 : 10;
+                        showFloatingGem(ach.tier === 'Bronze' ? 3 : ach.tier === 'Silver' ? 5 : 10);
+                        needsSave = true;
+                    } else if (!ach.rewarded && typeof ach.condition !== 'function') {
+                        console.warn(`Thành tựu ${id} thiếu hàm condition. Tái tạo...`);
+                        achievements.set(id, { ...defaultAchievements[id], rewarded: ach.rewarded });
+                        ErrorFixerBot.fixError(new Error(`ach.condition is not a function for ${id}`), 'checkAchievements');
+                    }
+                });
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'checkAchievements');
+            }
+        }
+
+        function updateFriendBonuses() {
+            try {
+                const now = Date.now();
+                if (now - lastFriendBonusTime < 24 * 60 * 60 * 1000) return;
+                let totalBonus = 0;
+                friendsInvited.forEach(friendCode => {
+                    const friendData = JSON.parse(localStorage.getItem(`moneyClickerSupremeProPlus-${friendCode}`)) || {};
+                    const friendUsdt = friendData.totalUsdtEarned || 0;
+                    const bonus = Math.min(friendUsdt * 0.05, 1);
+                    totalBonus += bonus;
+                });
+                if (totalBonus > 0) {
+                    friendBonusUsdt += totalBonus;
+                    usdt += totalBonus;
+                    showFloatingUsdt(totalBonus);
+                    showAchievement(`Thưởng bạn bè: +${totalBonus.toFixed(4)} USDT`);
+                    needsSave = true;
+                }
+                lastFriendBonusTime = now;
+                requestAnimationFrame(updateDisplay);
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'updateFriendBonuses');
+            }
+        }
+
+        function updateLeaderboard() {
+            try {
+                const fakePlayers = [
+                    { name: 'Người chơi 1', score: (usdt * (1.4 + prestigeLevel * 0.1 + vipLevel * 0.2)).toFixed(4) },
+                    { name: 'Người chơi 2', score: (usdt * (1 - prestigeLevel * 0.05)).toFixed(4) },
+                    { name: 'Bạn', score: usdt.toFixed(4) },
+                    { name: 'Người chơi 3', score: (usdt * (0.7 - vipLevel * 0.1)).toFixed(4) }
+                ].sort((a, b) => b.score - a.score);
+                elements.leaderboardList.innerHTML = fakePlayers.map(p => `<li>${p.name}: ${p.score} USDT</li>`).join('');
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'updateLeaderboard');
+            }
+        }
+
+        function toggleTheme() {
+            try {
+                document.body.classList.toggle('light-mode');
+                needsSave = true;
+                toggleMenu();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'toggleTheme');
+            }
+        }
+
+        function toggleSound() {
+            try {
+                soundEnabled = !soundEnabled;
+                elements.soundBtn.textContent = `Âm thanh: ${soundEnabled ? 'Bật' : 'Tắt'}`;
+                if (soundEnabled) {
+                    playSound(audio.music);
+                } else {
+                    audio.music.pause();
+                }
+                needsSave = true;
+                toggleMenu();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'toggleSound');
+            }
+        }
+
+        function toggleParticle() {
+            try {
+                particleEnabled = !particleEnabled;
+                elements.particleBtn.textContent = `Hiệu ứng: ${particleEnabled ? 'Bật' : 'Tắt'}`;
+                if (particleEnabled && graphicsMode !== 'ultra-low') animateParticles();
+                needsSave = true;
+                toggleMenu();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'toggleParticle');
+            }
+        }
+
+        function toggleGraphics() {
+            try {
+                const modes = ['high', 'low', 'ultra-low'];
+                const currentIndex = modes.indexOf(graphicsMode);
+                graphicsMode = modes[(currentIndex + 1) % modes.length];
+                elements.graphicsBtn.textContent = `Đồ họa: ${graphicsMode === 'high' ? 'Cao' : graphicsMode === 'low' ? 'Thấp' : 'Siêu thấp'}`;
+                if (graphicsMode === 'ultra-low') {
+                    particleEnabled = false;
+                    elements.particleBtn.textContent = 'Hiệu ứng: Tắt';
+                }
+                needsSave = true;
+                toggleMenu();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'toggleGraphics');
+            }
+        }
+
+        function resetGame() {
+            try {
+                if (confirm('Bạn có chắc muốn reset toàn bộ tiến độ?')) {
+                    localStorage.removeItem(`moneyClickerSupremeProPlus-${inviteCode}`);
+                    localStorage.removeItem('moneyClickerSupremeProPlus');
+                    window.location.reload();
+                }
+                toggleMenu();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'resetGame');
+            }
+        }
+
+        setInterval(() => {
+            try {
+                if (autoPower > 0) {
+                    const prestigeBonus = 1 + prestigeLevel * 0.1;
+                    const vipBonus = 1 + vipLevel * 0.2;
+                    const earned = autoPower * multiplier * combo * prestigeBonus * vipBonus;
+                    usdt += earned;
+                    totalUsdtEarned += earned;
+                    needsSave = true;
+                }
+                updateFriendBonuses();
+                requestAnimationFrame(updateDisplay);
+                checkMissions();
+                checkAchievements();
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'autoClickInterval');
+            }
+        }, 1000);
+
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d', { alpha: true });
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+        canvas.width = window.innerWidth * (isMobile ? 0.5 : 1);
+        canvas.height = window.innerHeight * (isMobile ? 0.5 : 1);
+        canvas.style.width = `${window.innerWidth}px`;
+        canvas.style.height = `${window.innerHeight}px`;
+
+        const particles = [];
+        const maxParticles = () => {
+            if (graphicsMode === 'ultra-low') return 0;
+            if (graphicsMode === 'low') return isMobile ? 5 : 10;
+            return isMobile ? 15 : 25;
+        };
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * (graphicsMode === 'high' ? 3 : 2) + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.1;
+            }
+            draw() {
+                ctx.fillStyle = document.body.classList.contains('light-mode') ? '#ffaa00' : '#ffd700';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function handleParticles() {
+            try {
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update();
+                    particles[i].draw();
+                    if (particles[i].size <= 0.2) {
+                        particles.splice(i, 1);
+                    }
+                }
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'handleParticles');
+            }
+        }
+
+        let lastFrame = 0;
+        function animateParticles(timestamp) {
+            try {
+                if (!particleEnabled || graphicsMode === 'ultra-low') return;
+                if (timestamp - lastFrame < (graphicsMode === 'low' ? 33 : 16)) {
+                    requestAnimationFrame(animateParticles);
+                    return;
+                }
+                lastFrame = timestamp;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (particles.length < maxParticles() && Math.random() < (graphicsMode === 'high' ? 0.05 : 0.03)) {
+                    particles.push(new Particle());
+                }
+                handleParticles();
+                requestAnimationFrame(animateParticles);
+            } catch (e) {
+                ErrorFixerBot.fixError(e, 'animateParticles');
+            }
+        }
+        if (particleEnabled && graphicsMode !== 'ultra-low') animateParticles(0);
+
+        function saveGame() {
+            try {
+                if (!needsSave) return;
+                const now = Date.now();
+                if (now - lastSaveTime < 10000) return;
+                lastSaveTime = now;
+                needsSave = false;
+                const gameData = {
+                    usdt: parseFloat(usdt),
+                    gems,
+                    clickPower: parseFloat(clickPower),
+                    clickCost: parseFloat(clickCost),
+                    clickLevel,
+                    autoPower: parseFloat(autoPower),
+                    autoCost: parseFloat(autoCost),
+                    autoLevel,
+                    multiplier: parseFloat(multiplier),
+                    multiplierCost,
+                    multiplierLevel,
+                    clickCount,
+                    totalUsdtEarned: parseFloat(totalUsdtEarned),
+                    combo: parseFloat(combo),
+                    prestigeLevel,
+                    vipLevel,
+                    missions: Object.fromEntries(missions),
+                    achievements: Object.fromEntries(
+                        Array.from(achievements.entries()).map(([id, ach]) => [
+                            id,
+                            { name: ach.name, rewarded: ach.rewarded, tier: ach.tier }
+                        ])
+                    ),
+                    currentSkin,
+                    soundEnabled,
+                    particleEnabled,
+                    graphicsMode,
+                    startTime,
+                    lastDailyReward,
+                    lastWithdraw,
+                    inviteCode,
+                    referredBy,
+                    friendsInvited,
+                    friendBonusUsdt: parseFloat(friendBonusUsdt),
+                    lastFriendBonusTime,
+                    theme: document.body.classList.contains('light-mode') ? 'light' : 'dark'
+                };
+                localStorage.setItem(`moneyClickerSupremeProPlus-${inviteCode}`, JSON.stringify(gameData));
+                localStorage.setItem('moneyClickerSupremeProPlus', JSON.stringify({ inviteCode }));
+            } catch (e) {
+                showError('Không thể lưu game.');
+                ErrorFixerBot.fixError(e, 'saveGame');
+            }
+        }
+
+        function loadGame() {
+            try {
+                const mainData = JSON.parse(localStorage.getItem('moneyClickerSupremeProPlus'));
+                if (mainData && mainData.inviteCode) {
+                    const gameData = JSON.parse(localStorage.getItem(`moneyClickerSupremeProPlus-${mainData.inviteCode}`));
+                    if (gameData) {
+                        usdt = parseFloat(gameData.usdt) || 0;
+                        gems = gameData.gems || 0;
+                        clickPower = parseFloat(gameData.clickPower) || 0.0001;
+                        clickCost = parseFloat(gameData.clickCost) || 0.01;
+                        clickLevel = gameData.clickLevel || 1;
+                        autoPower = parseFloat(gameData.autoPower) || 0;
+                        autoCost = parseFloat(gameData.autoCost) || 0.05;
+                        autoLevel = gameData.autoLevel || 0;
+                        multiplier = parseFloat(gameData.multiplier) || 1;
+                        multiplierCost = gameData.multiplierCost || 5;
+                        multiplierLevel = gameData.multiplierLevel || 1;
+                        clickCount = gameData.clickCount || 0;
+                        totalUsdtEarned = parseFloat(gameData.totalUsdtEarned) || 0;
+                        combo = parseFloat(gameData.combo) || 1;
+                        prestigeLevel = gameData.prestigeLevel || 0;
+                        vipLevel = gameData.vipLevel || 0;
+                        missions.forEach((v, k) => missions.set(k, gameData.missions[k] || v));
+                        Object.keys(defaultAchievements).forEach(id => {
+                            const savedAch = gameData.achievements?.[id] || {};
+                            achievements.set(id, {
+                                ...defaultAchievements[id],
+                                rewarded: savedAch.rewarded || false
+                            });
+                        });
+                        currentSkin = gameData.currentSkin || currentSkin;
+                        soundEnabled = gameData.soundEnabled ?? true;
+                        particleEnabled = gameData.particleEnabled ?? true;
+                        graphicsMode = gameData.graphicsMode || 'high';
+                        startTime = gameData.startTime || Date.now();
+                        lastDailyReward = gameData.lastDailyReward || 0;
+                        lastWithdraw = gameData.lastWithdraw || 0;
+                        inviteCode = gameData.inviteCode || generateInviteCode();
+                        referredBy = gameData.referredBy || '';
+                        friendsInvited = gameData.friendsInvited || [];
+                        friendBonusUsdt = parseFloat(gameData.friendBonusUsdt) || 0;
+                        lastFriendBonusTime = gameData.lastFriendBonusTime || 0;
+                        if (gameData.theme === 'light') document.body.classList.add('light-mode');
+                        elements.clickSkin.src = currentSkin;
+                        elements.soundBtn.textContent = `Âm thanh: ${soundEnabled ? 'Bật' : 'Tắt'}`;
+                        elements.particleBtn.textContent = `Hiệu ứng: ${particleEnabled ? 'Bật' : 'Tắt'}`;
+                        elements.graphicsBtn.textContent = `Đồ họa: ${graphicsMode === 'high' ? 'Cao' : graphicsMode === 'low' ? 'Thấp' : 'Siêu thấp'}`;
+                        if (soundEnabled) playSound(audio.music);
+                    }
+                } else {
+                    inviteCode = generateInviteCode();
+                }
+                requestAnimationFrame(updateDisplay);
+                ErrorFixerBot.init();
+            } catch (e) {
+                showError('Không thể tải game.');
+                ErrorFixerBot.fixError(e, 'loadGame');
+            }
+        }
+
+        setInterval(saveGame, 10000);
+        document.addEventListener('DOMContentLoaded', loadGame);
+    </script>
+</body>
+</html>
